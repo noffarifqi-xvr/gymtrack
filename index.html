@@ -498,6 +498,10 @@ function homeV(){
     h+='<div class="card done" style="--c:'+d.color+'"><div class="eyebrow">Sudah absen ✓</div><div class="title" style="margin-top:4px">'+d.name+'</div><p class="muted small" style="margin-top:2px">'+(ci.d==='rest'?'Istirahat juga bagian dari progres 💤':d.sub)+'</p><div class="row" style="margin-top:14px">'+
       (ci.d==='rest'?'':'<button class="btn grow" data-a="startDay" data-d="'+ci.d+'">Mulai latihan</button>')+'<button class="btn ghost" data-a="changeToday">Ganti</button></div></div>';
   }
+  var tl=p.logs[today]||{},tids=Object.keys(tl).filter(function(id){return EX[id]&&tl[id].length});
+  if(tids.length){
+    h+='<div class="card"><div class="eyebrow" style="margin-bottom:6px">Dicatat hari ini</div>'+tids.map(function(id){var s=tl[id];return '<div class="row between" style="padding:8px 0;border-top:1px solid var(--line)"><span>'+esc(EX[id].n)+'</span><span class="small" style="color:var(--y);text-align:right">'+s.length+' set · '+esc(s.map(setTxt).join(', '))+'</span></div>'}).join('')+'</div>';
+  }
   h+='<div class="stats"><div class="card flat stat"><div class="v">🔥 '+s.cur+'</div><div class="l">hari beruntun</div></div><div class="card flat stat"><div class="v">'+sessions(ymd(ws),ymd(addDays(ws,6)))+'</div><div class="l">sesi minggu ini</div></div><div class="card flat stat"><div class="v">'+sessions(ymd(new Date(now.getFullYear(),now.getMonth(),1)),ymd(new Date(now.getFullYear(),now.getMonth()+1,0)))+'</div><div class="l">sesi bulan ini</div></div></div>';
   h+='<div class="card"><div class="eyebrow" style="margin-bottom:8px">Minggu ini</div><div class="week">';
   for(var i=0;i<7;i++){var dt=addDays(ws,i),k=ymd(dt),c=p.checkins[k],di=c?dayInfo(c.d):null;h+='<div><div class="d">'+DOWS[i]+'</div><div class="c'+(c?' on':'')+(k===today?' today':'')+'" style="'+(di?'background:'+di.color:'')+'">'+(di?di.letter:dt.getDate())+'</div></div>'}
@@ -507,7 +511,8 @@ function homeV(){
   return h+'</div>';
 }
 
-function lastTxt(id){var l=lastSets(id,true);if(!l)return 'Belum pernah dicatat';var t=topSet(l.sets);return 'Terakhir: '+setTxt(t)+' ('+shortDate(l.date)+')'}
+function todaySets(id){var l=P().logs[ymd()];return (l&&l[id])||[]}
+function lastTxt(id){var ts=todaySets(id);if(ts.length)return '✓ Hari ini: '+ts.length+' set · terberat '+setTxt(topSet(ts));var l=lastSets(id,true);if(!l)return 'Belum pernah dicatat';var t=topSet(l.sets);return 'Terakhir: '+setTxt(t)+' ('+shortDate(l.date)+')'}
 
 function programV(){
   var h='<div class="stack"><div><h2 class="title" style="font-size:24px">Program latihan</h2><p class="muted small">Pilih hari, lalu tap gerakan untuk lihat animasi dan catat beban.</p></div>';
